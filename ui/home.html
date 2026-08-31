@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Incredibulk</title>
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="home.css" />
+  </head>
+  <body>
+    <!-- The front door. First run shows the tour; every visit after shows the
+         actions, so this window is worth opening again. -->
+    <div class="shell">
+      <section class="tour" id="tour" hidden>
+        <div class="tour-head">
+          <div class="dots" id="dots" aria-hidden="true"></div>
+          <button class="ghost small" id="skip">Skip</button>
+        </div>
+
+        <div class="steps">
+          <article class="step" data-step="0">
+            <div class="mark" aria-hidden="true">
+              <span></span><span></span><span></span><em></em>
+            </div>
+            <h1>One paste instead of ten</h1>
+            <p>
+              Your clipboard holds one thing at a time, so collecting six
+              fragments means six trips back and forth. Incredibulk adds a session:
+              copy as much as you like, then paste all of it at once.
+            </p>
+          </article>
+
+          <article class="step" data-step="1">
+            <h1>Two shortcuts</h1>
+            <p>These work while any application has focus.</p>
+            <dl class="keys">
+              <dt><kbd id="key-start">Ctrl+Alt+C</kbd></dt>
+              <dd>Open a session. Keep copying with <kbd>Ctrl+C</kbd> as usual.</dd>
+              <dt><kbd id="key-flush">Ctrl+Alt+V</kbd></dt>
+              <dd>Paste everything you collected, as one block.</dd>
+            </dl>
+            <p class="aside">
+              Anything you copy is captured, however you copied it: the
+              keyboard, a right click, or an application with its own binding.
+            </p>
+          </article>
+
+          <article class="step" data-step="2">
+            <h1>The stack is yours to edit</h1>
+            <p>
+              A list appears while a session runs, without taking focus from
+              what you are doing. In it you can:
+            </p>
+            <ul class="bullets">
+              <li><strong>Untick</strong> a line to leave it out, without losing it.</li>
+              <li><strong>Click</strong> a line to fix a typo before it goes anywhere.</li>
+              <li><strong>Drag</strong> lines into the order you want.</li>
+              <li><strong>Type</strong> a line that was never on the clipboard.</li>
+              <li><strong>Name</strong> the session so you can find it later.</li>
+            </ul>
+          </article>
+
+          <article class="step" data-step="3">
+            <h1>A few choices</h1>
+            <label class="check">
+              <input type="checkbox" id="opt-autostart" />
+              <span>
+                Start Incredibulk when I log in
+                <em>A clipboard tool that is not running when you reach for it is no help.</em>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" id="opt-history" />
+              <span>
+                Keep finished sessions
+                <em>Pasted sessions are kept so you can paste them again later.</em>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" id="opt-rich" />
+              <span>
+                Keep images in the paste
+                <em>
+                  Plain text goes on the clipboard either way, so editors and
+                  terminals are unaffected.
+                </em>
+              </span>
+            </label>
+          </article>
+
+          <article class="step" data-step="4">
+            <h1>That is the whole thing</h1>
+            <p>
+              Incredibulk lives in the tray. Click its icon any time to come back
+              here, start a session, or look through what you kept.
+            </p>
+            <p class="aside">
+              Everything in the tour is in Settings, and you can reopen this
+              introduction from there.
+            </p>
+          </article>
+        </div>
+
+        <div class="tour-foot">
+          <button id="back" disabled>Back</button>
+          <button class="primary" id="next">Next</button>
+        </div>
+      </section>
+
+      <section class="home" id="home" hidden>
+        <header>
+          <div class="mark small" aria-hidden="true">
+            <span></span><span></span><span></span><em></em>
+          </div>
+          <div>
+            <h1>Incredibulk</h1>
+            <p id="status">No session open.</p>
+          </div>
+        </header>
+
+        <button class="action primary" id="start">
+          <strong id="start-title">Start a session</strong>
+          <span id="start-sub">Then copy as much as you need</span>
+        </button>
+
+        <div class="row">
+          <button class="action" id="history">
+            <strong>History</strong>
+            <span id="history-sub">Nothing kept yet</span>
+          </button>
+          <button class="action" id="settings">
+            <strong>Settings</strong>
+            <span>Shortcuts, format, behaviour</span>
+          </button>
+        </div>
+
+        <dl class="keys compact" id="cheatsheet"></dl>
+
+        <footer>
+          <button class="ghost small" id="replay">Show the introduction again</button>
+        </footer>
+      </section>
+    </div>
+    <script src="shortcut.js"></script>
+    <script src="home.js"></script>
+  </body>
+</html>

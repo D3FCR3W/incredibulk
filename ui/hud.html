@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Incredibulk session</title>
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="hud.css" />
+  </head>
+  <body>
+    <div class="hud">
+      <header data-tauri-drag-region>
+        <span class="pulse" id="pulse" aria-hidden="true"></span>
+        <h1 id="session-name" title="Click to name this session">Session</h1>
+        <span class="count" id="count">0</span>
+        <span class="spacer" data-tauri-drag-region></span>
+        <button class="ghost small" id="toggle-all" hidden>Untick all</button>
+        <button class="icon" id="open-history" title="History" aria-label="History">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M12 7v5l3 2" />
+          </svg>
+        </button>
+        <button class="icon" id="open-settings" title="Settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
+        <button class="icon" id="hide" title="Hide (Esc)" aria-label="Hide">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="body scroll">
+        <ol class="stack" id="stack"></ol>
+        <div class="empty" id="empty" hidden>
+          <p class="empty-title" id="empty-title">No session open</p>
+          <p class="empty-body" id="empty-body"></p>
+          <button class="primary" id="empty-action">Start a session</button>
+        </div>
+      </div>
+
+      <div class="compose" id="compose" hidden>
+        <input
+          type="text"
+          id="add-line"
+          placeholder="Type a line and press Enter"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <footer>
+        <button class="primary" id="flush" disabled>Paste all</button>
+        <button id="clear" disabled>Clear</button>
+        <button id="discard" disabled>Discard</button>
+      </footer>
+
+      <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    </div>
+    <script src="shortcut.js"></script>
+    <script src="hud.js"></script>
+  </body>
+</html>

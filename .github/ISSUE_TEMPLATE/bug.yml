@@ -1,0 +1,36 @@
+name: Bug report
+description: Something behaves differently from what you expected.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what happened, and what you expected instead.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Shown in the settings window, or the name of the file you downloaded.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [Windows 11, Windows 10, macOS, Linux]
+    validations:
+      required: true
+
+  - type: textarea
+    id: crash
+    attributes:
+      label: crash.log
+      description: >
+        If the app disappeared without a word, paste the contents of crash.log
+        from the settings folder. On Windows that is %APPDATA%\dev.incredibulk.app\.
+      render: text

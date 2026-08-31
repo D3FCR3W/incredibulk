@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # The model is pure Rust with no desktop behind it, so it runs anywhere and
+  # runs fast. Kept as its own job because it is the part worth knowing about
+  # first when something breaks.
+  core:
+    name: model
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --check
+      - run: cargo clippy -p incredibulk-core -- -D warnings
+      - run: cargo test -p incredibulk-core
+
+  windows:
+    name: build and test on windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy --workspace -- -D warnings
+      - run: cargo test --workspace
+      - run: cargo build --workspace --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: incredibulk-windows-x64
+          path: target/release/incredibulk.exe
+          if-no-files-found: error

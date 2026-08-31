@@ -1,0 +1,4 @@
+# The codebase is written with compact struct literals and short bodies kept
+# on one line, which reads better for the small value types this project is
+# mostly made of. Codified here so `cargo fmt` agrees with what is checked in.
+use_small_heuristics = "Max"

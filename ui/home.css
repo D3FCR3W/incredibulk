@@ -1,0 +1,305 @@
+/* The front door: a five step introduction the first time, and a launcher
+   every time after. Both live in one window so the tour can be replayed
+   without inventing a second place for it to live. */
+
+.shell {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The product mark, drawn in CSS so it matches the icon without shipping a
+   second copy of it: loose fragments above the block they collapse into. */
+.mark {
+  width: 64px;
+  height: 64px;
+  border-radius: 15px;
+  background: linear-gradient(160deg, #1b1e3a, #0f1124);
+  border: 1px solid var(--line);
+  padding: 13px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: none;
+}
+
+.mark span,
+.mark em {
+  display: block;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--text);
+}
+
+.mark span:nth-child(1) {
+  width: 60%;
+}
+.mark span:nth-child(2) {
+  width: 78%;
+}
+.mark span:nth-child(3) {
+  width: 50%;
+}
+
+.mark em {
+  height: 7px;
+  width: 100%;
+  background: var(--accent);
+}
+
+.mark.small {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  padding: 9px 8px;
+}
+
+.mark.small span,
+.mark.small em {
+  height: 3px;
+}
+
+.mark.small em {
+  height: 5px;
+}
+
+/* Tour ------------------------------------------------------------------ */
+
+.tour {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tour-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 0;
+  flex: none;
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background 160ms ease, width 160ms ease;
+}
+
+.dots i.on {
+  background: var(--accent);
+  width: 18px;
+  border-radius: 99px;
+}
+
+.steps {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 28px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.step {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 18px;
+  animation: enter 180ms ease-out;
+}
+
+.step.on {
+  display: flex;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step {
+    animation: none;
+  }
+}
+
+.step h1 {
+  margin: 0;
+  font-size: 21px;
+  letter-spacing: -0.015em;
+}
+
+.step p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 46ch;
+  line-height: 1.6;
+}
+
+.step .aside {
+  color: var(--faint);
+  font-size: 12px;
+}
+
+.bullets {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.bullets strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.keys {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 10px 14px;
+  margin: 4px 0;
+  align-items: baseline;
+}
+
+.keys dt {
+  margin: 0;
+}
+
+.keys dd {
+  margin: 0;
+  color: var(--muted);
+}
+
+.keys.compact {
+  gap: 6px 12px;
+  font-size: 12px;
+}
+
+kbd {
+  font: 12px/1.5 var(--mono);
+  background: var(--bg-row);
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  padding: 3px 7px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.tour-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px 18px;
+  border-top: 1px solid var(--line-soft);
+  background: var(--bg-elev);
+  flex: none;
+}
+
+.check {
+  display: grid;
+  grid-template-columns: 15px 1fr;
+  gap: 11px;
+  align-items: start;
+  cursor: pointer;
+}
+
+.check input {
+  margin-top: 3px;
+}
+
+.check > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.check em {
+  font-style: normal;
+  color: var(--faint);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Home ------------------------------------------------------------------ */
+
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  height: 100%;
+}
+
+.home header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.home h1 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: -0.015em;
+}
+
+.home header p {
+  margin: 2px 0 0;
+  color: var(--muted);
+}
+
+/* One obvious thing to do, then the two places to go. */
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  width: 100%;
+}
+
+.action strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.action span {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.action.primary span {
+  opacity: 0.85;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.home .keys {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--faint);
+}
+
+.home footer {
+  display: flex;
+  justify-content: center;
+  flex: none;
+}

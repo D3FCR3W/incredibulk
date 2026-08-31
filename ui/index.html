@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Incredibulk</title>
+    <link rel="stylesheet" href="app.css" />
+    <style>
+      /* Not a window the app opens. It exists because a frontend needs an
+         entry point, and because someone poking at the bundle deserves a
+         sentence explaining where the application actually is. */
+      body {
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 40px;
+      }
+      p {
+        color: var(--muted);
+        max-width: 44ch;
+      }
+      strong {
+        color: var(--text);
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <p>
+        <strong>Incredibulk lives in the system tray.</strong><br />
+        Open a session, copy as much as you need, then paste it all as one
+        block. Right click the tray icon for settings.
+      </p>
+    </div>
+  </body>
+</html>

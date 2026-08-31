@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Incredibulk settings</title>
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <div class="brand">
+          <h1>Incredibulk</h1>
+          <p>Open a session, copy as much as you need, paste it as one block.</p>
+        </div>
+        <div class="actions">
+          <span class="status" id="status" role="status" aria-live="polite"></span>
+          <button id="reset">Reset to defaults</button>
+          <button class="primary" id="save">Save</button>
+        </div>
+      </header>
+
+      <div class="columns">
+        <div class="forms scroll">
+          <section>
+            <h2>Shortcuts</h2>
+            <p class="hint">
+              Click a field and press the combination you want. These are global:
+              they work while any application has focus.
+            </p>
+            <div class="grid">
+              <label>
+                <span>Start or discard a session</span>
+                <input type="text" class="shortcut" data-path="hotkeys.toggle_session" readonly />
+              </label>
+              <label>
+                <span>Flush and paste</span>
+                <input type="text" class="shortcut" data-path="hotkeys.flush" readonly />
+              </label>
+              <label>
+                <span>Discard without pasting</span>
+                <input type="text" class="shortcut" data-path="hotkeys.cancel" readonly />
+              </label>
+              <label>
+                <span>Undo the last capture</span>
+                <input type="text" class="shortcut" data-path="hotkeys.undo_last" readonly />
+              </label>
+              <label>
+                <span>Show or hide the stack</span>
+                <input type="text" class="shortcut" data-path="hotkeys.toggle_hud" readonly />
+              </label>
+              <label>
+                <span>Open the history</span>
+                <input type="text" class="shortcut" data-path="hotkeys.history" readonly />
+              </label>
+            </div>
+          </section>
+
+          <section>
+            <h2>What gets captured</h2>
+            <div class="checks">
+              <label class="check">
+                <input type="checkbox" data-path="capture.dedupe" />
+                <span>
+                  Skip repeats
+                  <em>Copying the same fragment twice adds it once.</em>
+                </span>
+              </label>
+              <label class="check">
+                <input type="checkbox" data-path="capture.capture_images" />
+                <span>
+                  Capture images
+                  <em>They cannot join a text block, so they render as the placeholder below.</em>
+                </span>
+              </label>
+              <label class="check">
+                <input type="checkbox" data-path="capture.capture_files" />
+                <span>
+                  Capture copied files
+                  <em id="files-note"></em>
+                </span>
+              </label>
+            </div>
+            <div class="grid">
+              <label>
+                <span>Maximum items <em>0 for no limit</em></span>
+                <input type="number" min="0" max="10000" step="1" data-path="capture.max_items" />
+              </label>
+            </div>
+          </section>
+
+          <section>
+            <h2>Output format</h2>
+            <div class="grid">
+              <label class="wide">
+                <span>Start from a preset</span>
+                <select id="preset">
+                  <option value="">Custom</option>
+                </select>
+              </label>
+              <label class="wide">
+                <span>Each fragment</span>
+                <input type="text" data-path="template.item_format" spellcheck="false" />
+              </label>
+              <label>
+                <span>Between fragments</span>
+                <input type="text" data-path="template.separator" spellcheck="false" />
+              </label>
+              <label>
+                <span>Trim each fragment</span>
+                <label class="check inline">
+                  <input type="checkbox" data-path="template.trim_items" />
+                  <span>Drop leading and trailing whitespace</span>
+                </label>
+              </label>
+              <label>
+                <span>Before the first</span>
+                <input type="text" data-path="template.prefix" spellcheck="false" />
+              </label>
+              <label>
+                <span>After the last</span>
+                <input type="text" data-path="template.suffix" spellcheck="false" />
+              </label>
+              <label>
+                <span>Image placeholder</span>
+                <input type="text" data-path="template.image_format" spellcheck="false" />
+              </label>
+              <label>
+                <span>File path format</span>
+                <input type="text" data-path="template.file_format" spellcheck="false" />
+              </label>
+              <label>
+                <span>Time format</span>
+                <input type="text" data-path="template.time_format" spellcheck="false" />
+              </label>
+              <label>
+                <span>Date format</span>
+                <input type="text" data-path="template.date_format" spellcheck="false" />
+              </label>
+            </div>
+            <details class="tokens">
+              <summary>Tokens you can use</summary>
+              <dl>
+                <dt>{content}</dt><dd>the fragment itself</dd>
+                <dt>{index}</dt><dd>position, starting at 1</dd>
+                <dt>{index0}</dt><dd>position, starting at 0</dd>
+                <dt>{count}</dt><dd>how many fragments in total</dd>
+                <dt>{source}</dt><dd>window it was copied from</dd>
+                <dt>{kind}</dt><dd>text, image or files</dd>
+                <dt>{time}</dt><dd>when it was captured</dd>
+                <dt>{date}</dt><dd>the date it was captured</dd>
+                <dt>\n \t</dt><dd>newline and tab</dd>
+              </dl>
+              <p class="hint">
+                An unknown token is left exactly as you typed it rather than
+                dropped. Image placeholders also take {width} and {height};
+                file paths take {path}, {name}, {stem}, {ext} and {dir}.
+              </p>
+            </details>
+          </section>
+
+          <section>
+            <h2>What a paste contains</h2>
+            <p class="hint">
+              Rich puts the plain text on the clipboard as well, so editors and
+              terminals receive exactly what they always did. Only applications
+              that ask for formatting see the images.
+            </p>
+            <div class="grid">
+              <label class="wide">
+                <span>Pasted block</span>
+                <select data-path="behavior.paste_format">
+                  <option value="rich">Rich text, with images</option>
+                  <option value="plain">Plain text only</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section>
+            <h2>History</h2>
+            <div class="checks">
+              <label class="check">
+                <input type="checkbox" data-path="behavior.keep_history" />
+                <span>
+                  Keep finished sessions
+                  <em>A pasted session is kept so it can be pasted again later.</em>
+                </span>
+              </label>
+            </div>
+            <div class="grid">
+              <label>
+                <span>Sessions to keep</span>
+                <input type="number" min="1" max="500" step="1" data-path="behavior.history_limit" />
+              </label>
+            </div>
+          </section>
+
+          <section>
+            <h2>Behaviour</h2>
+            <div class="checks">
+              <label class="check">
+                <input type="checkbox" data-path="behavior.auto_paste" />
+                <span>
+                  Paste automatically
+                  <em>Otherwise the block is put on the clipboard and you paste it yourself.</em>
+                </span>
+              </label>
+              <label class="check">
+                <input type="checkbox" data-path="behavior.keep_open_after_flush" />
+                <span>
+                  Keep the session after pasting
+                  <em>For stamping the same block in several places.</em>
+                </span>
+              </label>
+              <label class="check">
+                <input type="checkbox" data-path="behavior.restore_clipboard_after_flush" />
+                <span>
+                  Put the previous clipboard back
+                  <em>Once the paste has landed, your earlier clipboard returns.</em>
+                </span>
+              </label>
+              <label class="check">
+                <input type="checkbox" data-path="behavior.capture_clipboard_on_start" />
+                <span>
+                  Start from what is already on the clipboard
+                  <em>Off by default: it usually picks up something stale.</em>
+                </span>
+              </label>
+              <label class="check">
+                <input type="checkbox" data-path="behavior.show_hud" />
+                <span>
+                  Show the stack window during a session
+                  <em>The tray icon still shows that a session is open.</em>
+                </span>
+              </label>
+              <label class="check">
+                <input type="checkbox" data-path="behavior.track_source_window" />
+                <span>
+                  Remember which window each fragment came from
+                  <em id="source-note"></em>
+                </span>
+              </label>
+              <label class="check">
+                <input type="checkbox" data-path="behavior.autostart" />
+                <span>
+                  Start Incredibulk when I log in
+                </span>
+              </label>
+            </div>
+            <div class="grid">
+              <label>
+                <span>Stack window corner</span>
+                <select data-path="behavior.hud_corner">
+                  <option value="top_left">Top left</option>
+                  <option value="top_right">Top right</option>
+                  <option value="bottom_left">Bottom left</option>
+                  <option value="bottom_right">Bottom right</option>
+                </select>
+              </label>
+              <label>
+                <span>Clipboard check interval <em>milliseconds</em></span>
+                <input type="number" min="30" max="5000" step="10" data-path="behavior.poll_interval_ms" />
+              </label>
+              <label>
+                <span>Pause before pasting <em>milliseconds</em></span>
+                <input type="number" min="0" max="5000" step="10" data-path="behavior.paste_delay_ms" />
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <aside class="preview-pane">
+          <h2>What a paste looks like</h2>
+          <pre class="preview" id="preview"></pre>
+          <div class="notes" id="notes"></div>
+        </aside>
+      </div>
+    </div>
+    <script src="shortcut.js"></script>
+    <script src="settings.js"></script>
+  </body>
+</html>
