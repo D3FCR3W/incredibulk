@@ -31,10 +31,12 @@ struct Footprint {
     cache_bytes: u64,
     executable: Option<PathBuf>,
     autostart: bool,
-    /// An uninstaller sitting beside the executable, which is what the
-    /// installer leaves. Its presence is the difference between "delete this
-    /// file" and "use Windows to remove the program".
-    uninstaller: Option<PathBuf>,
+    /// Whether this copy was put here by an installer rather than dropped in
+    /// by hand. It is the difference between "delete this file" and "use
+    /// Windows to remove the program", and getting it wrong sends someone to
+    /// delete a file out from under an install that still believes it is
+    /// there.
+    installed: bool,
 }
 
 impl Footprint {
@@ -46,11 +48,7 @@ impl Footprint {
         let cache_bytes = cache.as_deref().map(directory_size).unwrap_or(0);
 
         let executable = std::env::current_exe().ok();
-        let uninstaller = executable
-            .as_ref()
-            .and_then(|exe| exe.parent())
-            .map(|dir| dir.join("uninstall.exe"))
-            .filter(|path| path.exists());
+        let installed = executable.as_deref().is_some_and(was_installed);
 
         Self {
             settings,
@@ -58,12 +56,12 @@ impl Footprint {
             cache_bytes,
             executable,
             autostart: app.autolaunch().is_enabled().unwrap_or(false),
-            uninstaller,
+            installed,
         }
     }
 
     fn question(&self) -> String {
-        let opening = if self.uninstaller.is_some() {
+        let opening = if self.installed {
             "This clears what Incredibulk leaves in your profile. The program itself \
              is removed through Windows, in Settings under Installed apps."
         } else {
@@ -138,7 +136,7 @@ fn perform(app: &AppHandle, footprint: Footprint) {
     // With an installer in play, the program is Windows' to remove, so
     // pointing at the executable would send the user to delete a file out from
     // under an install that still thinks it is there.
-    let installed = footprint.uninstaller.is_some();
+    let installed = footprint.installed;
     if !installed && let Some(exe) = &footprint.executable {
         leftovers.push(exe.clone());
     }
@@ -187,6 +185,26 @@ fn perform(app: &AppHandle, footprint: Footprint) {
         });
 }
 
+/// Whether an executable at this path was put there by an installer.
+///
+/// Two signals, because the two installers leave different traces. NSIS drops
+/// an `uninstall.exe` beside the program. An MSI leaves nothing next to it at
+/// all and registers with Windows instead, but it installs into a program
+/// directory, which a portable copy has no reason to be in.
+///
+/// A false negative here is mild: the user is told to delete a file that
+/// Windows will remove for them. A false positive is worse, so this only
+/// treats the standard program directories as installed, not merely any path
+/// the user cannot write to.
+fn was_installed(exe: &std::path::Path) -> bool {
+    if exe.parent().map(|dir| dir.join("uninstall.exe").exists()).unwrap_or(false) {
+        return true;
+    }
+
+    let program_dirs = ["ProgramFiles", "ProgramFiles(x86)", "ProgramW6432"];
+    program_dirs.iter().filter_map(std::env::var_os).any(|dir| exe.starts_with(PathBuf::from(dir)))
+}
+
 fn directory_size(path: &std::path::Path) -> u64 {
     let Ok(entries) = std::fs::read_dir(path) else {
         return 0;
@@ -209,6 +227,33 @@ fn human(bytes: u64) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_portable_copy_is_not_an_installed_one() {
+        let loose = std::env::temp_dir().join("incredibulk-portable-4f2a.exe");
+        assert!(!was_installed(&loose));
+    }
+
+    #[test]
+    fn an_uninstaller_beside_the_program_means_installed() {
+        let dir = std::env::temp_dir().join("incredibulk-nsis-4f2a");
+        std::fs::create_dir_all(&dir).expect("dirs");
+        std::fs::write(dir.join("uninstall.exe"), b"").expect("write");
+
+        assert!(was_installed(&dir.join("incredibulk.exe")));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn a_program_directory_means_installed() {
+        // Skipped where the variable is absent, which is every platform that
+        // does not have a Program Files to begin with.
+        let Some(dir) = std::env::var_os("ProgramFiles") else {
+            return;
+        };
+        let exe = PathBuf::from(dir).join("Incredibulk").join("incredibulk.exe");
+        assert!(was_installed(&exe));
+    }
 
     #[test]
     fn sizes_read_the_way_a_person_would_say_them() {
