@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "incredibulk",
+    "arboard",
+    "autostart",
+    "autolaunch",
+    "clippy",
+    "dedupe",
+    "enigo",
+    "hwnd",
+    "icns",
+    "keybindings",
+    "noreply",
+    "rustfmt",
+    "serde",
+    "tauri",
+    "unminimize",
+    "untick",
+    "unticked",
+    "unticking",
+    "webview",
+    "wsl",
+
+    "appdata",
+    "hdrop",
+    "localappdata",
+    "msvc",
+    "nsis",
+    "pwsh",
+    "wixobj",
+
+    "datauri",
+    "pointerdown",
+    "pointermove",
+    "pointerup",
+    "pointercancel",
+    "scrollintoview",
+
+    "supersample",
+    "supersampled",
+    "rgba",
+    "favicon"
+  ],
+  "ignorePaths": [
+    "target/**",
+    "dist/**",
+    "app/gen/**",
+    "Cargo.lock",
+    "**/*.png",
+    "**/*.ico",
+    "**/*.icns"
+  ],
+  "ignoreRegExpList": [
+    "/[0-9a-fA-F]{6,}/",
+    "/data:image[^\"')]*/"
+  ]
+}
