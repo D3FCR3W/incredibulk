@@ -16,7 +16,7 @@ jobs:
     name: model
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -29,7 +29,7 @@ jobs:
     name: build and test on windows
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
@@ -38,7 +38,7 @@ jobs:
       - run: cargo test --workspace
       - run: cargo build --workspace --release
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: incredibulk-windows-x64
           path: target/release/incredibulk.exe

@@ -1,0 +1,23 @@
+# Keeping dependencies current is maintenance nobody remembers to do by hand.
+# The workflow actions above went three major versions out of date in a matter
+# of months, which is how a repository starts warning on every run.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "ci"
+
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "deps"
+    # Patch bumps across 500 transitive crates would be noise. Only the
+    # updates worth reading about.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
