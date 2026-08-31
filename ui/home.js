@@ -189,6 +189,12 @@ function refresh() {
 listen("session", (event) => paintSession(event.payload));
 listen("history", (event) => paintHistory(event.payload));
 
+/* The tour shows two keys before the backend has answered. Filling them from
+ * the known defaults straight away avoids a Mac reading "Ctrl" for the moment
+ * it takes to ask. */
+el.keyStart.textContent = pretty("CmdOrCtrl+Alt+C");
+el.keyFlush.textContent = pretty("CmdOrCtrl+Alt+V");
+
 invoke("get_state")
   .then((state) => {
     config = state.config;

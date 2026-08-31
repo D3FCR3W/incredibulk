@@ -116,13 +116,13 @@ fn perform(app: &AppHandle, footprint: Footprint) {
     // The login entry first. If everything after this fails, at least the app
     // has stopped coming back on its own.
     if let Err(e) = app.autolaunch().disable() {
-        eprintln!("incredibulk: could not remove the login entry: {e}");
+        eprintln!("Incredibulk: could not remove the login entry: {e}");
     }
 
     if let Some(path) = &footprint.settings
         && let Err(e) = std::fs::remove_dir_all(path)
     {
-        eprintln!("incredibulk: could not remove {}: {e}", path.display());
+        eprintln!("Incredibulk: could not remove {}: {e}", path.display());
         leftovers.push(path.clone());
     }
 

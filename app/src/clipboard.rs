@@ -125,7 +125,7 @@ impl Backend {
             match Clipboard::new() {
                 Ok(c) => self.inner = Some(c),
                 Err(e) => {
-                    eprintln!("incredibulk: clipboard unavailable: {e}");
+                    eprintln!("Incredibulk: clipboard unavailable: {e}");
                     return None;
                 }
             }

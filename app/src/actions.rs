@@ -268,7 +268,7 @@ fn write_block(
     match rich {
         Some(html) => {
             if let Err(e) = clipboard.write_rich(html.to_string(), plain.to_string()) {
-                eprintln!("incredibulk: rich paste unavailable, falling back to text: {e}");
+                eprintln!("Incredibulk: rich paste unavailable, falling back to text: {e}");
                 clipboard.write_text(plain.to_string())
             } else {
                 Ok(())
@@ -296,7 +296,7 @@ fn archive_session(app: &AppHandle, items: Vec<ClipItem>, name: Option<String>) 
     // Saved outside the lock: small, but it is still disk and this runs on the
     // event loop.
     if let Err(e) = store::save_history(&saved, &path) {
-        eprintln!("incredibulk: history could not be saved: {e}");
+        eprintln!("Incredibulk: history could not be saved: {e}");
     }
     let _ = app.emit("history", saved.views());
 }

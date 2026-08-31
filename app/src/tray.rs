@@ -62,7 +62,7 @@ pub fn build(app: &AppHandle) -> tauri::Result<()> {
                     actions::notify(app, actions::Notice::from_error(e));
                 }
             }
-            other => eprintln!("incredibulk: unhandled tray item {other}"),
+            other => eprintln!("Incredibulk: unhandled tray item {other}"),
         })
         .on_tray_icon_event(|tray, event| {
             if let TrayIconEvent::Click { button, button_state, .. } = event

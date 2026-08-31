@@ -45,7 +45,7 @@ pub fn create_windows(app: &App) -> tauri::Result<()> {
         .build()?;
 
     WebviewWindowBuilder::new(app, HOME_LABEL, WebviewUrl::App("home.html".into()))
-        .title("incredibulk")
+        .title("Incredibulk")
         .inner_size(560.0, 620.0)
         .min_inner_size(460.0, 520.0)
         .resizable(true)

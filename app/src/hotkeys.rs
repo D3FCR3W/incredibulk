@@ -61,6 +61,6 @@ fn dispatch(app: &AppHandle, action: &str) {
                 actions::notify(app, actions::Notice::from_error(e));
             }
         }
-        other => eprintln!("incredibulk: no action bound to {other}"),
+        other => eprintln!("Incredibulk: no action bound to {other}"),
     }
 }

@@ -59,7 +59,7 @@ fn install_crash_log(dir: std::path::PathBuf) {
                 let _ = file.write_all(line.as_bytes());
             }
         }
-        eprintln!("incredibulk: {line}");
+        eprintln!("Incredibulk: {line}");
         previous(info);
     }));
 }
@@ -124,7 +124,7 @@ fn main() {
             let (config, config_error) = match store::load_config(&config_path) {
                 Ok(c) => (c, None),
                 Err(e) => {
-                    eprintln!("incredibulk: {e}");
+                    eprintln!("Incredibulk: {e}");
                     (Config::default(), Some(e.to_string()))
                 }
             };
@@ -150,7 +150,7 @@ fn main() {
             tray::build(&handle)?;
 
             if let Err(e) = hotkeys::reregister(&handle, &hotkeys) {
-                eprintln!("incredibulk: {e}");
+                eprintln!("Incredibulk: {e}");
                 // Kept, not just announced: at this point no window is open to
                 // receive the notice, and a shortcut that silently does nothing
                 // is the failure a user is least able to diagnose.
@@ -162,7 +162,7 @@ fn main() {
             // config that says autostart is on stays a lie until the user opens
             // settings and saves again.
             if let Err(e) = commands::sync_autostart(&handle, wants_autostart) {
-                eprintln!("incredibulk: autostart could not be set: {e}");
+                eprintln!("Incredibulk: autostart could not be set: {e}");
             }
 
             // No dock icon on macOS: this is a tray utility, and a bouncing
