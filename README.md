@@ -66,8 +66,11 @@ No prebuilt binaries yet. [Build from source](#building), then check
 | Show or hide the stack window | `Ctrl+Alt+S` |
 | Open the history | `Ctrl+Alt+H` |
 
-All rebindable in settings, which you reach from the tray icon or the gear in
-the stack window.
+**On macOS these are `Cmd+Alt` instead.** Each binding is stored as
+`CmdOrCtrl`, which resolves to Command there and to Control everywhere else.
+
+All six are rebindable in settings, which you reach from the tray icon or the
+gear in the stack window.
 
 `Ctrl+Alt` rather than `Ctrl+Shift` is deliberate: `Ctrl+Shift+C` and
 `Ctrl+Shift+V` are already copy and paste in most terminals.
