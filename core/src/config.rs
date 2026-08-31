@@ -147,6 +147,9 @@ pub struct Behavior {
     pub history_limit: usize,
     /// Archive a session when it is pasted. Off means nothing is kept.
     pub keep_history: bool,
+    /// Look for a new version on startup, and offer it rather than
+    /// installing it behind the user's back.
+    pub check_for_updates: bool,
 }
 
 impl Default for Behavior {
@@ -165,6 +168,7 @@ impl Default for Behavior {
             paste_format: PasteFormat::Rich,
             history_limit: crate::history::DEFAULT_LIMIT,
             keep_history: true,
+            check_for_updates: true,
         }
     }
 }

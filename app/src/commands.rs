@@ -237,6 +237,18 @@ pub fn open_home(app: AppHandle) {
 }
 
 /// Bring the stack window back, whether or not it was put away.
+/// Ask whether a newer version exists. Never installs anything.
+#[tauri::command]
+pub async fn check_for_update(app: AppHandle) -> crate::update::UpdateStatus {
+    crate::update::check(&app).await
+}
+
+/// Download, verify and install. Refused while a session is collecting.
+#[tauri::command]
+pub async fn install_update(app: AppHandle) -> Result<(), String> {
+    crate::update::install(&app).await
+}
+
 #[tauri::command]
 pub fn open_stack(app: AppHandle) {
     let state = app.state::<AppState>();

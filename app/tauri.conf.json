@@ -34,5 +34,16 @@
         ]
       }
     }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/D3FCR3W/incredibulk/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDk1NTNFQUMyMDZCNUE2QkUKUldTK3ByVUd3dXBUbFhwemQ2RnR3aUhPRENubXp3S3MzRUdsbUZWTlVSL2h4SjlBcWxQS0VZQlcK",
+      "windows": {
+        "installMode": "passive"
+      }
+    }
   }
 }

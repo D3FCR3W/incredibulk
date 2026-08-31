@@ -38,12 +38,17 @@ session has a beginning and an end, and the end produces one block.
 
 ### Windows
 
-Download the latest zip from [Releases](../../releases), unzip it, run
-`incredibulk.exe`. Around 2.3 MB zipped.
+**[Download the installer](../../releases/latest/download/Incredibulk-win-x64-setup.exe)**
+and run it. That link always points at the newest release.
 
-A zip rather than an installer because Incredibulk genuinely is one file. Asking
-someone to run an installer for a single executable is friction with nothing
-behind it, and the tray menu already removes what the app leaves behind.
+The installer is the recommended way, because **it is what makes updates work**:
+Incredibulk checks for a new version shortly after launch, shows a button when
+there is one, and installs it on request. A portable copy has nothing to replace
+itself with.
+
+If you would rather have no installer at all, the zip on the
+[releases page](../../releases) is a single 2.3 MB executable you can drop
+anywhere. You then update it by downloading it again.
 
 First run shows **"Windows protected your PC"**. Click *More info*, then *Run
 anyway*. The build is not code signed. Getting rid of that warning needs a code
@@ -229,6 +234,19 @@ settings, rather than quietly overwriting what you wrote.
 
 If the app ever disappears without a word, `crash.log` in the same folder is
 where it says why.
+
+## Updates
+
+Incredibulk looks for a new version shortly after launch and shows a button on
+the home screen when there is one. It never installs anything on its own, and
+it refuses to restart while a session is collecting, because everything in a
+session lives in memory.
+
+Every update is signed, and the signature is checked against a key compiled
+into the program before any of it runs. An update that does not verify is not
+installed.
+
+Turn the check off in settings under **Look for new versions**.
 
 ## Uninstalling
 

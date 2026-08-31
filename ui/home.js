@@ -30,6 +30,10 @@ const el = {
   settings: document.getElementById("settings"),
   cheatsheet: document.getElementById("cheatsheet"),
   replay: document.getElementById("replay"),
+  update: document.getElementById("update"),
+  updateTitle: document.getElementById("update-title"),
+  updateNote: document.getElementById("update-note"),
+  updateInstall: document.getElementById("update-install"),
 };
 
 let config = null;
@@ -177,6 +181,40 @@ function paintHistory(entries) {
         : `${count} sessions kept`;
 }
 
+/* Updates ---------------------------------------------------------------
+
+ * Offered, never imposed. The banner appears only when there is something to
+ * install, and installing is a button because a restart in the middle of a
+ * session would throw away what was collected. */
+function showUpdate(status) {
+  if (!status || !status.available) {
+    el.update.hidden = true;
+    return;
+  }
+  el.updateTitle.textContent = `Version ${status.version} is available`;
+  el.updateNote.textContent = firstLine(status.notes) || "";
+  el.update.hidden = false;
+}
+
+/* Release notes can run to paragraphs. The banner has room for a sentence. */
+function firstLine(notes) {
+  if (!notes) return "";
+  const line = notes.split("\n").map((l) => l.trim()).find((l) => l.length > 0);
+  return line && line.length > 90 ? `${line.slice(0, 89)}\u2026` : line || "";
+}
+
+el.updateInstall.addEventListener("click", () => {
+  el.updateInstall.disabled = true;
+  el.updateInstall.textContent = "Downloading\u2026";
+  invoke("install_update").catch((e) => {
+    el.updateInstall.disabled = false;
+    el.updateInstall.textContent = "Install and restart";
+    el.updateTitle.textContent = String(e);
+  });
+});
+
+listen("update", (event) => showUpdate(event.payload));
+
 function refresh() {
   return invoke("get_state").then((state) => {
     config = state.config;
@@ -209,6 +247,12 @@ invoke("get_state")
     if (config.onboarded) {
       el.home.hidden = false;
       invoke("get_history").then(paintHistory).catch(() => {});
+      // The startup check may already have run and emitted before this window
+      // was opened, so ask rather than wait for an event that has been and
+      // gone.
+      if (config.behavior.check_for_updates) {
+        invoke("check_for_update").then(showUpdate).catch(() => {});
+      }
     } else {
       el.tour.hidden = false;
       showStep(0);

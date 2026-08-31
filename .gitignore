@@ -4,3 +4,7 @@ target/
 app/gen/
 *.log
 /dist
+
+# Update signing keys never belong in the repository.
+*.key
+*.key.pub

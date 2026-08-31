@@ -15,6 +15,7 @@ mod state;
 mod store;
 mod tray;
 mod uninstall;
+mod update;
 
 use incredibulk_core::Config;
 use tauri::{Manager, RunEvent, WindowEvent};
@@ -77,6 +78,8 @@ fn main() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, None))
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             commands::get_state,
             commands::start_session,
@@ -101,6 +104,8 @@ fn main() {
             commands::open_history,
             commands::open_home,
             commands::open_stack,
+            commands::check_for_update,
+            commands::install_update,
             commands::finish_onboarding,
             commands::rename_session,
             commands::rename_history_entry,
@@ -169,6 +174,10 @@ fn main() {
             // dock entry for a window that is normally hidden is noise.
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+
+            // Looked for a few seconds after launch, so it never competes
+            // with claiming the shortcuts or registering the tray icon.
+            update::check_in_background(&handle);
 
             actions::broadcast(&handle);
 

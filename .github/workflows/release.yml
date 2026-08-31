@@ -1,0 +1,66 @@
+name: release
+
+# Tag a version, get a release. Nothing is built by hand on anyone's laptop:
+# a local build is unreproducible, and it is also the kind of artefact a
+# signing service will refuse to touch later.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      # Builds, signs the update artefacts, creates the draft release and
+      # attaches latest.json, which is what the app in the field reads to
+      # learn that a new version exists.
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          projectPath: app
+          tagName: ${{ github.ref_name }}
+          releaseName: Incredibulk ${{ github.ref_name }}
+          releaseBody: |
+            See [CHANGELOG.md](https://github.com/D3FCR3W/incredibulk/blob/main/CHANGELOG.md).
+
+            Windows will show "Windows protected your PC" on first run because
+            this build is not code signed. Click More info, then Run anyway.
+          releaseDraft: true
+          includeUpdaterJson: true
+
+      # A download link in the README should never need editing again, so the
+      # installer is also published under a name with no version in it.
+      # /releases/latest/download/Incredibulk-win-x64-setup.exe then works
+      # forever.
+      - name: publish under a stable name
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $setup = Get-ChildItem -Recurse -Filter '*-setup.exe' |
+                   Where-Object { $_.FullName -like '*bundle*' } |
+                   Select-Object -First 1
+          if (-not $setup) { throw 'no NSIS installer was produced' }
+
+          $stable = Join-Path $setup.Directory 'Incredibulk-win-x64-setup.exe'
+          Copy-Item $setup.FullName $stable -Force
+
+          # A checksum file, so anyone can tell that what they downloaded is
+          # what was built.
+          $hash = (Get-FileHash $stable -Algorithm SHA256).Hash.ToLower()
+          $line = "$hash  Incredibulk-win-x64-setup.exe"
+          $sums = Join-Path $setup.Directory 'checksums.txt'
+          Set-Content -Path $sums -Value $line -Encoding ascii
+
+          gh release upload ${{ github.ref_name }} $stable $sums --clobber

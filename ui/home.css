@@ -232,6 +232,43 @@ kbd {
   line-height: 1.5;
 }
 
+/* A new version is worth one line and one button, above the thing you came
+   here to do but not in place of it. */
+.update {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--accent);
+  background: rgba(124, 108, 255, 0.12);
+}
+
+.update-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.update-text strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.update-text span {
+  font-size: 12px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.update button {
+  flex: none;
+}
+
 /* Home ------------------------------------------------------------------ */
 
 .home {
