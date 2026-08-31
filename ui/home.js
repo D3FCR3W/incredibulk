@@ -53,7 +53,7 @@ function showStep(index) {
   );
 
   el.back.disabled = step === 0;
-  el.next.textContent = step === el.steps.length - 1 ? "Start using incredibulk" : "Next";
+  el.next.textContent = step === el.steps.length - 1 ? "Start using Incredibulk" : "Next";
   el.steps[step].scrollIntoView({ block: "nearest" });
 }
 
