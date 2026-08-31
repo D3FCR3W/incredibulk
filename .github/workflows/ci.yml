@@ -3,7 +3,14 @@ name: ci
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
+
+# Pushing three times in a minute should not leave three builds racing each
+# other. The only run worth finishing is the one for the newest commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always
@@ -12,7 +19,7 @@ jobs:
   # The model is pure Rust with no desktop behind it, so it runs anywhere and
   # runs fast. Kept as its own job because it is the part worth knowing about
   # first when something breaks.
-  core:
+  model:
     name: model
     runs-on: ubuntu-latest
     steps:
@@ -34,11 +41,19 @@ jobs:
         with:
           components: clippy
       - uses: Swatinem/rust-cache@v2
-      - run: cargo clippy --workspace -- -D warnings
+      - run: cargo clippy --workspace --all-targets -- -D warnings
       - run: cargo test --workspace
-      - run: cargo build --workspace --release
 
-      - uses: actions/upload-artifact@v7
+      # A release build takes longer than everything above put together and
+      # proves nothing the debug build has not already proven. It runs when a
+      # version is tagged, which is when the binary is actually wanted.
+      - name: build the release binary
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: cargo build -p incredibulk --release
+
+      - name: upload the release binary
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v7
         with:
           name: incredibulk-windows-x64
           path: target/release/incredibulk.exe
