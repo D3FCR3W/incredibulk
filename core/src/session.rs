@@ -137,7 +137,9 @@ impl Session {
     /// Drop the most recent capture. Bound to a hotkey so a misfire can be
     /// undone without opening the HUD.
     pub fn undo_last(&mut self) -> Option<ClipItem> {
-        self.items.pop()
+        // IDs follow capture order even after the user rearranges the stack.
+        let pos = self.items.iter().enumerate().max_by_key(|(_, item)| item.id)?.0;
+        Some(self.items.remove(pos))
     }
 
     /// Reorder within the stack. Out-of-range moves are a no-op, not an error:
@@ -518,6 +520,23 @@ mod tests {
         s.undo_last();
         cap(&mut s, "b");
         assert_eq!(s.items()[0].id, 2);
+    }
+
+    #[test]
+    fn undo_follows_capture_order_after_reordering_and_removal() {
+        let mut s = sess();
+        cap(&mut s, "first");
+        cap(&mut s, "second");
+        cap(&mut s, "third");
+        s.move_to(3, 0);
+        s.remove(2);
+        assert_eq!(s.undo_last().unwrap().kind, ClipKind::text("third"));
+        assert_eq!(s.render(&Template::default()), "first");
+        s.add_text("typed last".into(), 0);
+        s.move_item(4, MoveDirection::Up);
+        assert_eq!(s.undo_last().unwrap().kind, ClipKind::text("typed last"));
+        assert_eq!(s.undo_last().unwrap().kind, ClipKind::text("first"));
+        assert!(s.undo_last().is_none());
     }
 
     #[test]
