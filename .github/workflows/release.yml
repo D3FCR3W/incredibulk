@@ -22,7 +22,7 @@ jobs:
       # Builds, signs the update artefacts, creates the draft release and
       # attaches latest.json, which is what the app in the field reads to
       # learn that a new version exists.
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
