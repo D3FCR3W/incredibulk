@@ -51,6 +51,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
+      - name: test update data preservation
+        shell: powershell
+        run: ./tools/update-windows.tests.ps1
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
