@@ -8,6 +8,9 @@ contributing is low and the guidance is short.
 You need a Rust toolchain. There is no npm step: the frontend is plain HTML,
 CSS and JavaScript, served as-is.
 
+On Ubuntu 22.04+ or Debian 12+, run `bash tools/setup-linux.sh` first to install
+the native desktop dependencies. It asks for your sudo password if needed.
+
 ```sh
 cargo test              # the model, the store, and the platform helpers
 cargo run -p incredibulk

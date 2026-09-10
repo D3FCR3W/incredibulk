@@ -1,6 +1,7 @@
 /target
 target/
 .cargo/config.toml
+.cargo/linux-deps/
 app/gen/
 *.log
 /dist

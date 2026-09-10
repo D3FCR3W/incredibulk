@@ -32,6 +32,20 @@ jobs:
       - run: cargo clippy -p incredibulk-core -- -D warnings
       - run: cargo test -p incredibulk-core
 
+  linux:
+    name: build and test on linux
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: install native dependencies
+        run: bash tools/setup-linux.sh
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - run: cargo test --workspace --locked
+
   windows:
     name: build and test on windows
     runs-on: windows-latest
