@@ -22,17 +22,13 @@ cargo run -p incredibulk
 | --- | --- |
 | `core/` | The model. Sessions, capture rules, editing, history, rendering. Pure Rust: no filesystem, no OS, no threads. |
 | `app/` | The shell. Clipboard, shortcuts, tray, windows, persistence. |
-| `ui/` | The three windows, in plain HTML, CSS and JavaScript. |
+| `ui/` | The four windows (home, stack, history, settings), in plain HTML, CSS and JavaScript. |
 
 **The split is the point.** Anything that decides *what a session does* belongs
 in `core`, where it can be tested without a desktop. Anything that touches a
 clipboard, a file, a window or a keyboard belongs in `app`. If you find
 yourself wanting `std::fs` inside `core`, that is the signal that the logic and
 the plumbing have got mixed up.
-
-This is not hexagonal architecture and does not pretend to be. There are no
-ports and no injected adapters, because a single-user clipboard tool does not
-earn that ceremony. It is a pure model with a shell around it.
 
 ## Before opening a pull request
 

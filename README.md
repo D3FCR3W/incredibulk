@@ -8,343 +8,197 @@
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![release](https://img.shields.io/github/v/release/D3FCR3W/incredibulk?include_prereleases&sort=semver)](../../releases)
 
-<!-- TODO: record docs/demo.gif and uncomment the line below.
-     Ten seconds, no narration: open a session, copy four things from
-     different windows, untick one, drag another, paste into a document.
-     <img src="docs/demo.gif" alt="A session collecting four fragments and pasting them as one block" width="640"> -->
-
 </div>
 
-The system clipboard is a register of size one. Every copy destroys the last
-one, which is why collecting six things means six trips back and forth.
-
-Incredibulk adds a **session**: an explicit begin, an append-only stack, one
-commit.
+Your clipboard holds one thing at a time, so collecting six fragments means six
+trips back and forth. Incredibulk adds a **session**: open it, copy as much as
+you like from anywhere, then paste everything as one block.
 
 ## How it works
 
 1. **`Ctrl+Alt+C`** opens a session.
-2. **Copy as much as you like**, from anywhere. Editor, browser, PDF, terminal.
-   Keep using `Ctrl+C`. Nothing is lost.
-3. **Work in the stack window.** Untick a line to leave it out, click it to
-   edit, drag to reorder, or type one that was never copied at all.
-4. **`Ctrl+Alt+V`** renders what is left as one block and pastes it into
-   whatever window you are in.
+2. **Copy as usual** with `Ctrl+C`, from any application. Each copy is added to
+   the stack instead of replacing the last one.
+3. **Tidy the stack** in the small window that appears: untick a line to leave
+   it out, click one to edit it, drag to reorder, or type a line by hand.
+4. **`Ctrl+Alt+V`** pastes the whole stack as one block into the window you
+   are in.
 
-This is not a clipboard history you pick items back out of one at a time. The
-session has a beginning and an end, and the end produces one block.
+It is not a clipboard history you pick items out of one by one. A session has a
+beginning and an end, and the end is one paste.
 
 ## Install
 
 ### Windows
 
 **[Download the installer](../../releases/latest/download/Incredibulk-win-x64-setup.exe)**
-and run it. That link always points at the newest release.
+and run it. The link always points at the newest release.
 
-The installer is the recommended way, because **it is what makes updates work**:
-Incredibulk checks for a new version shortly after launch, shows a button when
-there is one, and installs it on request. A portable copy has nothing to replace
-itself with.
+The first run shows **"Windows protected your PC"** because the build is not
+code signed. Click *More info*, then *Run anyway*.
 
-If you would rather have no installer at all, the zip on the
-[releases page](../../releases) is a single 2.3 MB executable you can drop
-anywhere. You then update it by downloading it again.
-
-First run shows **"Windows protected your PC"**. Click *More info*, then *Run
-anyway*. The build is not code signed. Getting rid of that warning needs a code
-signing certificate, and an EV one before SmartScreen trusts a new publisher
-immediately.
+Prefer a single file? The zip on the [releases page](../../releases) contains
+one portable executable. It cannot update itself, so you download it again
+when a new version comes out.
 
 ### macOS and Linux
 
-No prebuilt binaries yet. [Build from source](#building), then check
+No prebuilt binaries yet. [Build from source](#building) and check
 [platform support](#platform-support) for what works where.
 
 ## Shortcuts
 
-| Action | Default |
+| What | Default |
 | --- | --- |
 | Open a session, or discard the open one | `Ctrl+Alt+C` |
-| Flush and paste, or repeat the last session | `Ctrl+Alt+V` |
+| Paste the stack, or repeat the last session | `Ctrl+Alt+V` |
 | Discard without pasting | `Ctrl+Alt+X` |
 | Undo the last capture | `Ctrl+Alt+Z` |
 | Show or hide the stack window | `Ctrl+Alt+S` |
 | Open the history | `Ctrl+Alt+H` |
 
-**On macOS these are `Cmd+Alt` instead.** Each binding is stored as
-`CmdOrCtrl`, which resolves to Command there and to Control everywhere else.
-
-All six are rebindable in settings, which you reach from the tray icon or the
-gear in the stack window.
-
-`Ctrl+Alt` rather than `Ctrl+Shift` is deliberate: `Ctrl+Shift+C` and
+On macOS read `Cmd+Alt` instead of `Ctrl+Alt`. All six can be changed in
+Settings. `Ctrl+Alt` was chosen over `Ctrl+Shift` because `Ctrl+Shift+C` and
 `Ctrl+Shift+V` are already copy and paste in most terminals.
 
-## The tray icon is the front door
+## Using it
 
-Incredibulk has no window of its own until you ask for one.
+**The tray icon is the front door.** Incredibulk has no window of its own until
+you ask for one. Click the icon to open the home window (start a session,
+history, settings), or the stack when a session is running. The first launch
+shows a short introduction; it can be skipped and reopened later from Settings.
 
-Click the tray icon with no session running and the home screen opens, with one
-button to start a session and the way through to history and settings. Click it
-during a session and the stack comes up instead.
+**The stack window** appears when a session opens and never steals focus.
+Tick boxes leave a line out without deleting it, clicking a line edits it in
+place, the grip handle drags it elsewhere, the field at the bottom adds a line
+that was never copied, and clicking the title names the session. Images show
+as thumbnails. The paste button always says how many lines are going in.
 
-First launch turns that home screen into a five step introduction. Skippable at
-any point, reopened later from the bottom of the same screen. It offers the
-choices worth making up front: start on login (on by default), keep finished
-sessions, and whether a paste carries images.
+**History** keeps every session you pasted, 50 by default, across restarts.
+Open it from the tray, from the clock icon in the stack window, or with
+`Ctrl+Alt+H`. Tick one session to paste it again, or several to paste them as
+one block in the order they happened. **Copy without pasting** puts the block
+on the clipboard instead. `Ctrl+F` searches by name, text, file path or source
+window.
 
-## The stack window
+**`Ctrl+Alt+V` with no session open** still pastes something: the sessions
+ticked in the history, or the most recent one when nothing is ticked.
 
-It appears when a session opens and stays there while it runs, without taking
-focus away from what you are doing.
-
-| In the list | What it does |
-| --- | --- |
-| Tick box | Leaves a line out of the paste without deleting it. Unticked lines stay visible and can be put back. |
-| Number | Where that line will land in the block. Unticked lines have none, and the rest close up behind them. |
-| Click the text | Edits it in place. Enter commits, Shift+Enter adds a line, Escape reverts. Emptying it removes the line. |
-| Grip handle | Drag a line anywhere in the stack, with a drop line showing where it lands. Focus it and use the arrow keys if you would rather not drag. |
-| Close button | Puts the window away for the rest of the session. Capturing carries on, and the tray icon still shows the session is live. |
-| The title | Click it to name the session. The name follows it into the history, where sessions are otherwise a wall of timestamps. |
-| Bottom field | Types a line that was never on the clipboard. |
-| Tick all / Untick all | Flips the whole stack at once. |
-
-The counter reads `3 of 5` when some lines are unticked, and the paste button
-always says how many lines are actually going in. Images appear as thumbnails
-rather than as a line of text describing them.
-
-The window appears without taking focus, so opening a session never interrupts
-what you are typing. The flip side is that it is a background window: the first
-click on it activates it, as with any other.
-
-## History
-
-A session is kept when you paste it, up to 50 of them, and survives a restart.
-Open it from the tray, from the clock icon in the stack window header, or with
-`Ctrl+Alt+H`.
-
-- Name or rename a session while it runs or afterwards, from the button on each
-  row.
-- Tick one session to paste it again.
-- Tick several and they paste as a single block, combined in the order they
-  happened, oldest first, renumbered across the whole thing.
-- **Copy without pasting** puts the block on the clipboard instead.
-
-Images are kept too, up to 4 MB each. Anything larger keeps its dimensions but
-not its pixels, so it replays as a description rather than a picture.
-
-## What `Ctrl+Alt+V` does when nothing is collecting
-
-It always pastes something. With a session running it pastes what you collected.
-With no session, or one that has caught nothing yet, it falls back to the
-history:
-
-| Situation | What gets pasted |
-| --- | --- |
-| Sessions ticked in the history list | Those sessions, combined, oldest first |
-| Nothing ticked | The most recent session, again |
-
-Ticking is an explicit choice made in a list that says what the shortcut will
-do, so it wins. Either way the shortcut can be pressed as many times as you
-like, and it says which rule applied. It therefore means one thing at all times:
-put that block where the cursor is.
-
-The single exception is a live session whose fragments you have all unticked.
-That is a decision you just made inside that session, so it says so rather than
-quietly pasting a different one behind your back.
-
-## Images
-
-An image cannot go into a text block, it can only be described. So when a
-session contains one, the block is put on the clipboard twice:
-
-- **as rich text**, with the image embedded
-- **as plain text**, where the image is its placeholder
-
-Applications that ask for formatting get the picture. Editors, terminals and
-anything else asking for plain text get exactly the text they would have got
-otherwise, so nothing is worse off for this.
-
-If you would rather never send formatting at all, set the paste format to
-**Plain text only** in settings. Images then always paste as `[image 1920x1080]`.
-
-## Output format
-
-The block is rendered from a template, not a fixed join. Presets cover the
-common shapes (one per line, blank line between, numbered, markdown bullets,
-fenced block, comma separated) and every field is editable, with a live preview
-of your actual session.
+**Output format** is a template, not a fixed join. Presets cover the usual
+shapes (one per line, blank line between, numbered, markdown bullets, with
+source and time, comma separated, fenced block) and every field can be edited,
+with a live preview of your actual stack.
 
 | Scope | Tokens |
 | --- | --- |
 | Any line | `{content}` `{index}` `{index0}` `{count}` `{source}` `{kind}` `{time}` `{date}` |
-| Image placeholders | `{width}` `{height}` |
-| File paths | `{path}` `{name}` `{stem}` `{ext}` `{dir}` |
+| Image placeholder | `{width}` `{height}` |
+| File path | `{path}` `{name}` `{stem}` `{ext}` `{dir}` |
 
-An unknown token is left exactly as typed rather than silently dropped.
-
-## How a copy is noticed
-
-While a session is open the clipboard itself is watched, rather than the
-`Ctrl+C` keystroke being intercepted. That way a fragment is captured however it
-was copied: the keyboard, a right click, an application with its own copy
-binding.
-
-On Windows the watcher first checks the clipboard sequence number, so polling
-costs nothing until something actually changes.
+**Images** cannot go into a text block, so the paste goes on the clipboard
+twice: as rich text with the image embedded, and as plain text with a
+placeholder such as `[image 1920x1080]`. Editors and terminals get the plain
+text, word processors get the picture. Set **Plain text only** in Settings to
+never send formatting at all. History keeps images up to 4 MB each.
 
 ## Platform support
 
 | | Windows | macOS | Linux (X11) | Linux (Wayland) |
 | --- | --- | --- | --- | --- |
-| Shortcuts, watching, tray, autostart | Yes | Yes | Yes | Compositor dependent |
+| Shortcuts, capture, tray, autostart | Yes | Yes | Yes | Compositor dependent |
 | Automatic paste | Yes | Needs Accessibility | Yes | Often unavailable |
 | Copied images | Yes | Yes | Yes | Yes |
 | Copied file lists | Yes | No | No | No |
 | `{source}` window title | Yes | No | No | No |
-| Rich paste (HTML flavour) | Tested | Untested | Untested | Untested |
+| Rich paste (HTML) | Tested | Untested | Untested | Untested |
 
-**Windows** is the platform this was built and tested on. Everything there
-works, including a second launch handing over to the instance already running.
+Windows is where it was built and tested. macOS asks for Accessibility
+permission before the paste keystroke works. Wayland restricts input
+synthesis, so **Paste automatically** may need to be switched off, leaving the
+block on the clipboard for you to paste yourself.
 
-**macOS** prompts for Accessibility permission on first use, and the synthesized
-paste keystroke does nothing until it is granted.
+## Where it keeps its files
 
-**Wayland** restricts input synthesis, so *Paste automatically* may need to be
-switched off, leaving the block on the clipboard for you to paste yourself.
+`config.json`, `history.json` and, after a crash, `crash.log`:
 
-**Copied file lists** are read through the Windows pasteboard only. Copying
-files in Explorer adds their paths to the session. macOS and Linux would need
-their own readers, so a file copy is simply not seen there.
-
-## Files it writes
-
-`config.json` and `history.json`, in the platform config directory:
-
-| OS | Path |
+| OS | Folder |
 | --- | --- |
 | Windows | `%APPDATA%\dev.incredibulk.app` |
 | macOS | `~/Library/Application Support/dev.incredibulk.app` |
 | Linux | `$XDG_CONFIG_HOME/dev.incredibulk.app` |
 
-Missing fields fall back to defaults and unknown ones are ignored, so a file
-written by an older or newer build still loads. A file that cannot be parsed
-does not stop the app: it starts on defaults and shows you the reason in
-settings, rather than quietly overwriting what you wrote.
-
-If the app ever disappears without a word, `crash.log` in the same folder is
-where it says why.
+A config file from an older or newer build still loads: missing fields fall
+back to defaults, unknown ones are ignored. A file that cannot be parsed does
+not stop the app; it starts on defaults and shows the reason in Settings.
 
 ## Updates
 
-Incredibulk looks for a new version shortly after launch and shows a button on
-the home screen when there is one. It never installs anything on its own, and
-it refuses to restart while a session is collecting, because everything in a
-session lives in memory.
+Incredibulk checks for a new version a few seconds after launch and shows an
+**Install and restart** button on the home window when there is one. It never
+installs anything on its own, and it refuses to restart while a session is
+open, because a session lives in memory. Every update is signed and verified
+against a key built into the program before it runs. Switch the check off
+under **Look for new versions** in Settings.
 
-Every update is signed, and the signature is checked against a key compiled
-into the program before any of it runs. An update that does not verify is not
-installed.
+## Removing it
 
-Turn the check off in settings under **Look for new versions**.
-
-## Uninstalling
-
-There is no installer, so there is nothing for Windows to uninstall. The program
-is one portable file.
-
-What it leaves behind is easy to miss, so **Remove Incredibulk** in the tray
-menu takes care of it: the login entry, your settings and saved sessions, and
-the webview cache, which quietly grows to tens of megabytes.
-
-It asks first and says exactly what will go. The executable cannot delete itself
-while running, and the cache folder is usually held open, so whatever is left is
-reported rather than silently skipped, with the paths put on your clipboard.
+**Remove Incredibulk** in the tray menu clears what the program leaves behind:
+the login entry, your settings and saved sessions, and the webview cache (tens
+of megabytes). It asks first and lists exactly what will go. If you used the
+installer, finish by uninstalling the program from Windows Settings under
+Installed apps; a portable copy is just a file to delete. Anything it could not
+remove itself is reported, with the paths put on your clipboard.
 
 ## Building
 
-Requires a Rust toolchain and the Tauri system dependencies for your platform.
-There is no npm step: the frontend is plain HTML, CSS and JavaScript in [ui/](ui/),
+You need a Rust toolchain and the
+[Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for your
+platform. There is no npm step: the frontend is plain HTML, CSS and JavaScript
 served straight from the bundle.
 
 ```sh
-cargo test  -p incredibulk-core     # session model, capture rules, templates
-cargo run   -p incredibulk          # run it
+bash tools/setup-linux.sh          # Ubuntu 22.04+ / Debian 12+: native libraries, once
+cargo test --workspace             # the model, the shell, the platform helpers
+cargo run -p incredibulk
 cargo build -p incredibulk --release
 ```
 
-<details>
-<summary><strong>Packaging a build for someone else</strong></summary>
+**Releases** are built by CI: push a `v*` tag and the release workflow builds
+and signs the Windows installer, then attaches it and the update manifest to a
+draft release.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File tools\package.ps1
-```
+**Windows packaging by hand**, for a build to give to someone:
 
-Builds in release and writes `dist/incredibulk-<version>-windows-x64.zip`,
-containing the executable and a note for whoever receives it: how to get past
-the SmartScreen warning, the two shortcuts, what it needs, and where the crash
-log lives.
+- `tools\installer.ps1` runs Clippy and the tests, builds the NSIS installer,
+  writes it with its SHA-256 into `dist/`, and adds an
+  `Incredibulk-update-<version>` folder with a one-click launcher that backs up
+  your data, installs silently and restarts the app. Needs the x64 MSVC
+  toolchain, `cargo install tauri-cli --locked` and 7-Zip.
+- `tools\package.ps1` builds the portable zip instead.
+- `cd app && cargo tauri build` produces the platform bundles (`.msi`, NSIS,
+  `.dmg`, `.deb`, `.AppImage`). Nothing is code signed.
 
-If you do want real installers (`.msi` and NSIS setup on Windows, `.dmg` on
-macOS, `.deb` and `.AppImage` on Linux):
-
-```sh
-cargo install tauri-cli --version '^2'
-cd app && cargo tauri build
-```
-
-Neither is code signed.
-
-</details>
-
-<details>
-<summary><strong>Building from a network or WSL working copy</strong></summary>
-
-A 9p or SMB mount cannot take the file locks rustc needs for incremental
-compilation, and the build fails before it starts. Point the output at a local
-disk:
-
-```sh
-CARGO_TARGET_DIR=/some/local/path cargo build
-```
-
-</details>
-
-<details>
-<summary><strong>Icons</strong></summary>
-
-Generated rather than checked in as opaque binaries. Edit the geometry at the
-top of [tools/make_icons.py](tools/make_icons.py) and re-run it to change the
-mark.
-
-</details>
+Building from a network or WSL mount fails on file locks; point
+`CARGO_TARGET_DIR` at a local disk. Icons are generated by
+`tools/make_icons.py`, not checked in.
 
 ## Layout
 
 | Path | What is in it |
 | --- | --- |
-| [core/](core/) | The model: session, capture policy, editing, history, plain and HTML rendering, config. Pure Rust, no filesystem, no OS, no UI toolkit. |
-| [app/](app/) | The shell: clipboard thread, global shortcuts, tray, windows, persistence. |
-| [ui/](ui/) | The four windows. Plain HTML, CSS and JavaScript. |
+| [core/](core/) | The model: session, capture rules, editing, history, rendering, config. Pure Rust, no OS, no UI. Most of the tests live here. |
+| [app/](app/) | The Tauri shell: clipboard watcher, global shortcuts, tray, windows, persistence, updater. |
+| [ui/](ui/) | The four windows (home, stack, history, settings). Plain HTML, CSS and JavaScript. |
+| [tools/](tools/) | Packaging and update scripts, Linux dependency setup, icon generator. |
 
-The split is the point. Everything that decides *what a session does* lives in
-`core` and can be tested without a desktop, which is why it carries most of the
-tests.
-
-**This is not hexagonal architecture**, and calling it that would be a stretch.
-There are no ports and no injected adapters: the shell calls the model directly.
-A single-user clipboard tool does not earn that ceremony. What it is is a pure
-model with a shell around it, and the boundary is real enough that the model
-compiles and tests on any machine with a Rust toolchain.
+Anything that decides what a session does belongs in `core`, where it can be
+tested without a desktop.
 
 ## Contributing
 
-Issues and pull requests welcome. Anything touching session behaviour, capture
-rules or templates belongs in `core`, with a test next to it. See
-[CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
-
-macOS and Linux are the thin spots: the platform table above is a list of open
-work as much as a list of caveats.
+Issues and pull requests welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) and
+[SECURITY.md](SECURITY.md). macOS and Linux are the thin spots: the platform
+table above is the open work.
 
 ## License
 
