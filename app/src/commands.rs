@@ -197,6 +197,13 @@ pub fn get_history(app: AppHandle) -> Vec<HistoryView> {
     lock(&state.history).views()
 }
 
+/// Search complete archived content without sending its payloads to the window.
+#[tauri::command]
+pub fn search_history(app: AppHandle, query: String) -> Vec<u64> {
+    let state = app.state::<AppState>();
+    lock(&state.history).search(&query)
+}
+
 /// Paste the ticked sessions as one block.
 #[tauri::command]
 pub fn replay_history(app: AppHandle, ids: Vec<u64>) -> Result<usize, String> {

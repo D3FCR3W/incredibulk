@@ -18,19 +18,28 @@
         </div>
       </header>
 
+      <div class="search-bar">
+        <label for="search">Search history</label>
+        <input id="search" type="text" placeholder="Name, content, file path or source…" autocomplete="off" spellcheck="false" aria-controls="list" />
+        <button id="reset-search" hidden>Clear search</button>
+        <span id="search-status" role="status" aria-live="polite"></span>
+      </div>
+
       <div class="columns">
         <div class="list scroll" id="list"></div>
 
         <aside class="preview-pane">
           <h2>What would be pasted</h2>
           <pre class="preview" id="preview"></pre>
-          <p class="note" id="note"></p>
         </aside>
       </div>
+
+      <p class="note" id="note"></p>
 
       <footer>
         <button class="primary" id="paste" disabled>Paste selected</button>
         <button id="copy" disabled>Copy without pasting</button>
+        <button id="deselect" disabled>Deselect all</button>
         <span class="spacer"></span>
         <button id="forget" disabled>Delete selected</button>
       </footer>

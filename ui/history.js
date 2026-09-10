@@ -19,12 +19,57 @@ const el = {
   copy: document.getElementById("copy"),
   forget: document.getElementById("forget"),
   clear: document.getElementById("clear"),
+  deselect: document.getElementById("deselect"),
+  search: document.getElementById("search"),
+  resetSearch: document.getElementById("reset-search"),
+  searchStatus: document.getElementById("search-status"),
   toast: document.getElementById("toast"),
 };
 
 let entries = [];
 const selected = new Set();
 let flushKey = "Ctrl+Alt+V";
+let matches = null;
+let searchVersion = 0;
+let searchTimer = null;
+let searching = false;
+let searchFailed = false;
+let previewVersion = 0;
+
+function visibleEntries() {
+  return matches === null ? entries : entries.filter((entry) => matches.has(entry.id));
+}
+
+/* Keep selection independent of the filter so several searches can build one
+ * block. Hidden selections are called out above the paste controls. */
+function refreshSearch(immediate = false) {
+  const version = ++searchVersion;
+  clearTimeout(searchTimer);
+  const query = el.search.value.trim();
+  el.resetSearch.hidden = el.search.value.length === 0;
+  searching = query.length > 0;
+  searchFailed = false;
+  matches = searching ? new Set() : null;
+  draw();
+  if (!searching) return;
+
+  searchTimer = setTimeout(() => {
+    invoke("search_history", { query })
+      .then((ids) => {
+        if (version !== searchVersion) return;
+        matches = new Set(ids);
+        searching = false;
+        draw();
+      })
+      .catch((error) => {
+        if (version !== searchVersion) return;
+        searching = false;
+        searchFailed = true;
+        draw();
+        reportFailure(error);
+      });
+  }, immediate ? 0 : 150);
+}
 
 /* formatShortcut comes from shortcut.js, loaded first. */
 const pretty = (accelerator) => formatShortcut(accelerator, "the paste shortcut");
@@ -181,6 +226,15 @@ function publishSelection() {
 }
 
 function draw() {
+  const visible = visibleEntries();
+  el.list.setAttribute("aria-busy", String(searching));
+  el.searchStatus.textContent = searching
+    ? "Searching…"
+    : searchFailed
+      ? "Search unavailable"
+      : matches !== null
+        ? `${visible.length} of ${plural(entries.length, "session", "sessions")}`
+        : "";
   el.subtitle.textContent =
     entries.length === 0
       ? "Nothing kept yet."
@@ -190,6 +244,7 @@ function draw() {
   el.paste.disabled = count === 0;
   el.copy.disabled = count === 0;
   el.forget.disabled = count === 0;
+  el.deselect.disabled = count === 0;
   el.clear.disabled = entries.length === 0;
   el.paste.textContent = count > 1 ? `Paste ${count} together` : "Paste selected";
 
@@ -200,32 +255,53 @@ function draw() {
         ? `${pretty(flushKey)} pastes this one.`
         : `Nothing ticked, so ${pretty(flushKey)} pastes the most recent session.`;
 
-  if (entries.length === 0) {
+  const hiddenCount = count - visible.filter((entry) => selected.has(entry.id)).length;
+  if (!searching && hiddenCount > 0) {
+    el.note.textContent += ` ${plural(hiddenCount, "selected session is", "selected sessions are")} hidden by the search and still included.`;
+  }
+
+  if (visible.length === 0) {
     const empty = document.createElement("div");
     empty.className = "empty";
     const title = document.createElement("strong");
-    title.textContent = "No sessions yet";
+    title.textContent = searching
+      ? "Searching…"
+      : searchFailed
+        ? "Search unavailable"
+        : entries.length === 0
+          ? "No sessions yet"
+          : "No matching sessions";
     const body = document.createElement("p");
-    body.textContent = "A session is kept here once you paste it.";
+    body.textContent = searching
+      ? "Looking through complete session content."
+      : searchFailed
+        ? "Change the search to try again, or clear it to see all sessions."
+        : entries.length === 0
+          ? "A session is kept here once you paste it."
+          : "Try another word, file path or source, or clear the search.";
     empty.append(title, body);
     el.list.replaceChildren(empty);
     return;
   }
 
-  el.list.replaceChildren(...entries.map(entryRow));
+  el.list.replaceChildren(...visible.map(entryRow));
 }
 
 function refreshPreview() {
+  const version = ++previewVersion;
   const ids = [...selected];
+  el.preview.textContent = "";
   if (ids.length === 0) {
-    el.preview.textContent = "";
     return;
   }
   invoke("preview_history", { ids })
     .then((text) => {
+      if (version !== previewVersion) return;
       el.preview.textContent = text;
     })
-    .catch(reportFailure);
+    .catch((error) => {
+      if (version === previewVersion) reportFailure(error);
+    });
 }
 
 let toastTimer = null;
@@ -274,13 +350,43 @@ el.clear.addEventListener("click", () => {
   invoke("clear_history").catch(reportFailure);
 });
 
+el.search.addEventListener("input", () => refreshSearch());
+el.resetSearch.addEventListener("click", () => {
+  el.search.value = "";
+  refreshSearch();
+  el.search.focus();
+});
+el.deselect.addEventListener("click", () => {
+  selected.clear();
+  draw();
+  refreshPreview();
+  publishSelection();
+});
+
 document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
+    e.preventDefault();
+    el.search.focus();
+    el.search.select();
+    return;
+  }
   if (e.key === "Escape") {
+    if (el.search.value) {
+      e.preventDefault();
+      el.search.value = "";
+      refreshSearch();
+      return;
+    }
     invoke("close_window", { label: "history" }).catch(() => {});
   }
-  if ((e.ctrlKey || e.metaKey) && e.key === "a") {
+  // Text fields keep their native select-all behavior, including renaming.
+  const textField = e.target.closest(
+    "input:not([type='checkbox']):not([type='radio']), textarea, [contenteditable='true']",
+  );
+  if (textField) return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
     e.preventDefault();
-    for (const entry of entries) selected.add(entry.id);
+    for (const entry of visibleEntries()) selected.add(entry.id);
     draw();
     refreshPreview();
     publishSelection();
@@ -294,7 +400,7 @@ function load(next) {
   for (const id of [...selected]) {
     if (!alive.has(id)) selected.delete(id);
   }
-  draw();
+  refreshSearch(true);
   refreshPreview();
   publishSelection();
 }

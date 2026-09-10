@@ -171,6 +171,36 @@ impl History {
         self.entries().map(HistoryView::of).collect()
     }
 
+    /// Match every search word against names, complete text, paths and sources.
+    /// Return only IDs: searching must not ship clipboard payloads to the UI.
+    pub fn search(&self, query: &str) -> Vec<u64> {
+        let words: Vec<String> = query.split_whitespace().map(str::to_lowercase).collect();
+        self.entries()
+            .filter(|entry| {
+                if words.is_empty() {
+                    return true;
+                }
+                let mut fields = vec![entry.name.as_deref().unwrap_or_default().to_lowercase()];
+                for item in &entry.items {
+                    if let Some(source) = &item.source {
+                        fields.push(source.to_lowercase());
+                    }
+                    match &item.kind {
+                        ClipKind::Text { text } => fields.push(text.to_lowercase()),
+                        ClipKind::Files { paths } => {
+                            fields.extend(paths.iter().map(|p| p.to_string_lossy().to_lowercase()));
+                        }
+                        ClipKind::Image { image } => {
+                            fields.push(format!("image {}x{}", image.width, image.height));
+                        }
+                    }
+                }
+                words.iter().all(|word| fields.iter().any(|field| field.contains(word)))
+            })
+            .map(|entry| entry.id)
+            .collect()
+    }
+
     fn trim(&mut self) {
         while self.entries.len() > self.limit {
             self.entries.pop_front();
@@ -289,6 +319,61 @@ mod tests {
             .enumerate()
             .map(|(i, t)| ClipItem::new(i as u64 + 1, ClipKind::text(*t), 0, None))
             .collect()
+    }
+
+    #[test]
+    fn search_reads_beyond_previews_and_matches_words_across_fields() {
+        let mut h = History::default();
+        let long_text = format!("{} Décision finale", "intro ".repeat(50));
+        let mut fragments = items(&[&long_text, "second fragment"]);
+        fragments[0].source = Some("Firefox".into());
+        h.record(fragments, Some("Projet été".into()), 1);
+        h.record(items(&["unrelated"]), None, 2);
+
+        assert!(!h.views()[1].preview.contains("Décision"));
+        assert_eq!(h.search("  ÉTÉ\tDÉCISION firefox\nsecond "), vec![1]);
+        assert!(h.search("décision missing").is_empty());
+        assert_eq!(h.search(" \n "), vec![2, 1]);
+        assert_eq!(h.search(""), vec![2, 1]);
+    }
+
+    #[test]
+    fn search_includes_full_paths_and_image_descriptions_but_not_image_bytes() {
+        let mut h = History::default();
+        h.record(
+            vec![ClipItem::new(
+                1,
+                ClipKind::Files { paths: vec!["/projects/private/report.pdf".into()] },
+                0,
+                None,
+            )],
+            None,
+            1,
+        );
+        let mut image = ImagePayload::raw(640, 480, Vec::new());
+        image.png = b"secretpixels".to_vec();
+        image.thumbnail = "secretthumbnail".into();
+        h.record(vec![ClipItem::new(1, ClipKind::Image { image }, 0, None)], None, 2);
+
+        assert_eq!(h.search("/PROJECTS/PRIVATE PDF"), vec![1]);
+        assert_eq!(h.search("IMAGE 640x480"), vec![2]);
+        assert!(h.search("secret").is_empty());
+    }
+
+    #[test]
+    fn search_tracks_renames_deletions_and_persisted_history() {
+        let mut h = History::default();
+        h.record(items(&["shared"]), Some("old name".into()), 1);
+        h.record(items(&["shared"]), None, 2);
+        assert_eq!(h.search("shared"), vec![2, 1]);
+        h.rename(1, "new name");
+        assert!(h.search("old").is_empty());
+        let mut loaded = History::from_json(&h.to_json().unwrap());
+        assert_eq!(loaded.search("new shared"), vec![1]);
+        loaded.remove(1);
+        assert!(loaded.search("new").is_empty());
+        loaded.clear();
+        assert!(loaded.search("").is_empty());
     }
 
     #[test]

@@ -110,6 +110,7 @@ fn main() {
             commands::rename_session,
             commands::rename_history_entry,
             commands::get_history,
+            commands::search_history,
             commands::replay_history,
             commands::set_history_selection,
             commands::forget_history,
