@@ -64,7 +64,9 @@ jobs:
           $hash = (Get-FileHash $stable -Algorithm SHA256).Hash.ToLower()
           $line = "$hash  Incredibulk-win-x64-setup.exe"
           $sums = Join-Path $setup.Directory 'checksums.txt'
-          Set-Content -Path $sums -Value $line -Encoding ascii
+          # Written with a bare LF: Set-Content would end the line with CRLF,
+          # which sha256sum -c on Linux and macOS reads as part of the file name.
+          [IO.File]::WriteAllText($sums, "$line`n")
 
           gh release upload ${{ github.ref_name }} $stable $sums --clobber
 
