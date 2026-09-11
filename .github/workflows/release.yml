@@ -38,6 +38,9 @@ jobs:
             this build is not code signed. Click More info, then Run anyway.
           releaseDraft: true
           includeUpdaterJson: true
+          # The recommended download is the NSIS setup.exe, so an update must
+          # fetch that one and not the MSI, which would install a second copy.
+          updaterJsonPreferNsis: true
 
       # A download link in the README should never need editing again, so the
       # installer is also published under a name with no version in it.
@@ -64,3 +67,15 @@ jobs:
           Set-Content -Path $sums -Value $line -Encoding ascii
 
           gh release upload ${{ github.ref_name }} $stable $sums --clobber
+
+      # The portable zip the README describes: one executable and a note for
+      # whoever receives it. tools/package.ps1 is the same script used by hand.
+      - name: publish the portable zip
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          powershell -ExecutionPolicy Bypass -File tools\package.ps1
+          $zip = Get-ChildItem dist -Filter '*-windows-x64.zip' | Select-Object -First 1
+          if (-not $zip) { throw 'no portable zip was produced' }
+          gh release upload ${{ github.ref_name }} $zip.FullName --clobber

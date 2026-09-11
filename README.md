@@ -164,8 +164,8 @@ cargo build -p incredibulk --release
 ```
 
 **Releases** are built by CI: push a `v*` tag and the release workflow builds
-and signs the Windows installer, then attaches it and the update manifest to a
-draft release.
+and signs the Windows installer, then attaches it, the portable zip and the
+update manifest to a draft release.
 
 **Windows packaging by hand**, for a build to give to someone:
 
