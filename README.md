@@ -1,6 +1,6 @@
 <div align="center">
 
-# Incredibulk
+<img src=".github/banner.png" alt="Incredibulk: copy more, paste once" width="560">
 
 **Copy ten things in a row. Paste them all at once.**
 
